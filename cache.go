@@ -19,6 +19,7 @@ package cache
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/lunny/tango"
 )
@@ -26,7 +27,7 @@ import (
 // Adapter is the interface that operates the cache data.
 type Adapter interface {
 	// Put puts value into cache with key and expire time.
-	Put(key string, val interface{}, timeout int64) error
+	Put(key string, val interface{}, timeout time.Duration) error
 	// Get gets cached value by given key.
 	Get(key string) interface{}
 	// Delete deletes cached value by given key.
@@ -124,7 +125,7 @@ func (c *Cache) SetCaches(cs *Caches) {
 }
 
 // Put puts value into cache with key and expire time.
-func (c *Caches) Put(key string, val interface{}, timeout int64) error {
+func (c *Caches) Put(key string, val interface{}, timeout time.Duration) error {
 	return c.adapter.Put(key, val, timeout)
 }
 

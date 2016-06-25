@@ -25,13 +25,13 @@ import (
 // MemoryItem represents a memory cache item.
 type MemoryItem struct {
 	val     interface{}
-	created int64
-	expire  int64
+	created time.Time
+	expire  time.Duration
 }
 
 func (item *MemoryItem) hasExpired() bool {
 	return item.expire > 0 &&
-		(time.Now().Unix()-item.created) >= item.expire
+		time.Now().Sub(item.created) >= item.expire
 }
 
 // MemoryCacher represents a memory cache adapter implementation.
@@ -48,13 +48,13 @@ func NewMemoryCacher() *MemoryCacher {
 
 // Put puts value into cache with key and expire time.
 // If expired is 0, it will be deleted by next GC operation.
-func (c *MemoryCacher) Put(key string, val interface{}, expire int64) error {
+func (c *MemoryCacher) Put(key string, val interface{}, expire time.Duration) error {
 	c.lock.Lock()
 	defer c.lock.Unlock()
 
 	c.items[key] = &MemoryItem{
 		val:     val,
-		created: time.Now().Unix(),
+		created: time.Now(),
 		expire:  expire,
 	}
 	return nil

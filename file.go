@@ -33,13 +33,13 @@ import (
 // Item represents a cache item.
 type Item struct {
 	Val     interface{}
-	Created int64
-	Expire  int64
+	Created time.Time
+	Expire  time.Duration
 }
 
 func (item *Item) hasExpired() bool {
 	return item.Expire > 0 &&
-		(time.Now().Unix()-item.Created) >= item.Expire
+		time.Now().Sub(item.Created) >= item.Expire
 }
 
 // FileCacher represents a file cache adapter implementation.
@@ -62,9 +62,9 @@ func (c *FileCacher) filepath(key string) string {
 
 // Put puts value into cache with key and expire time.
 // If expired is 0, it will be deleted by next GC operation.
-func (c *FileCacher) Put(key string, val interface{}, expire int64) error {
+func (c *FileCacher) Put(key string, val interface{}, expire time.Duration) error {
 	filename := c.filepath(key)
-	item := &Item{val, time.Now().Unix(), expire}
+	item := &Item{val, time.Now(), expire}
 	data, err := EncodeGob(item)
 	if err != nil {
 		return err
